@@ -11,10 +11,10 @@ First, we are going to load the csv as a data frame from the working directory.
 
 Also, we are going to create two different data frames. Data frame `df` is going to have the data "as is". The other frame, `df0`, is going to substitute all the `NA` values for zeros in the steps column.
 
-```{r echo=TRUE}
+
+```r
 df <- read.csv("activity.csv")
 df0 <- df ## Alternative data frame with zeros instead of NAs
-
 ```
 
 ### What is mean total number of steps taken per day?
@@ -22,7 +22,8 @@ df0 <- df ## Alternative data frame with zeros instead of NAs
 To answer this, we will make other data frame which will summarize the total number of steps per day. In order to show days with a total of zero steps (as a result of NAs in all intervals), we use the data that has zeros instead of NAs.
 
 
-```{r echo=TRUE}
+
+```r
 ##Calculate the total number of steps taken per day
 ## 
 subset1 <- aggregate(steps ~ date, df0, sum)
@@ -30,14 +31,14 @@ subset1 <- aggregate(steps ~ date, df0, sum)
 #calculate mean and median
 m <- mean(subset1$steps,na.rm=TRUE)
 md <- median(subset1$steps,na.rm=TRUE)
-
 ```
 
-Further, we can observe that the average number of steps is `r as.character(m)`, and the median is `r md`
+Further, we can observe that the average number of steps is 10766.1886792453, and the median is 10765
 
 By making and histogram, we can visualize how the total number of steps is distributed.
 
-```{r echo=TRUE}
+
+```r
 ## Make histogram
 hist(subset1$steps, breaks=20, col="cyan", 
      main="Histogram of total number of steps", 
@@ -46,11 +47,14 @@ hist(subset1$steps, breaks=20, col="cyan",
 abline(v=m, col="red")
 ```
 
+![plot of chunk unnamed-chunk-3](figure/unnamed-chunk-3-1.png) 
+
 ### What is the average daily activity pattern?
 
 First, we wish to have a mean value of a given interval, across all days, and then we are going to plot it.
 
-```{r echo=TRUE}
+
+```r
 ## Calculate the average number of steps taken in each in 5-min interval
 ## For accurate means, we will use the data with NAs
 subset2 <- aggregate(steps ~ interval, df, mean)
@@ -65,23 +69,33 @@ with(subset2, plot(interval, steps, type="l",
 abline(v=max, col="blue")
 ```
 
-Also, we can observe that the interval that has the maximum average of number of steps is `r max`.
+![plot of chunk unnamed-chunk-4](figure/unnamed-chunk-4-1.png) 
+
+Also, we can observe that the interval that has the maximum average of number of steps is 835.
 
 ### Imputing missing values
 
 First, we are going to check how many rows have `NA`. 
 
-```{r echo=TRUE}
+
+```r
 ## Calculate total number of NAs
 ## amount of "TRUE" is total of NAs
 table(is.na(df[,1]))
 ```
 
-Therefore, the total number of NAs is `r table(is.na(df[,1]))[2]`.
+```
+## 
+## FALSE  TRUE 
+## 15264  2304
+```
+
+Therefore, the total number of NAs is 2304.
 
 Now, we are going to fill all the missing values by using the mean for that day and see how this impacts the values from before.
 
-```{r echo=TRUE}
+
+```r
 ## Create a copy of the original dataset
 ## Using the mean for that day to fill the NAs
 dfnew <- df
@@ -98,6 +112,8 @@ hist(subset1new$steps, breaks=20, col="cyan",
      xlab="Total number of steps")
 ```
 
+![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-1.png) 
+
 The histograms appear to be the same. The reason for this is that there are not NAs in days that there are registered steps. That is, the days that had usage of the step counter counted steps for the whole day.
 
 Therefore, the only days that have NAs, have it in all its intervals.
@@ -109,7 +125,8 @@ To answer this question, we are going to create a new factor that will classify 
 
 Lastly, we will do a panel plot to ilustrate the differences.
 
-```{r echo=TRUE}
+
+```r
 ## Converting the date column to dates and adding another column
 ## defining if the date was a weekday or weekend
 library(chron)
@@ -126,3 +143,5 @@ library(lattice)
 subset2new <- aggregate(steps ~ interval+weektype, dfnew, mean)
 xyplot(steps ~ interval|weektype, data=subset2new, type="l",layout=c(1,2))
 ```
+
+![plot of chunk unnamed-chunk-7](figure/unnamed-chunk-7-1.png) 
